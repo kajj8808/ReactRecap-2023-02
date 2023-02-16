@@ -3,6 +3,7 @@ import { Categories, IToDo, toDoSate } from "../atoms";
 
 function ToDo({ text, category, id }: IToDo) {
   const setToDos = useSetRecoilState(toDoSate);
+
   const onClick = (newCategory: IToDo["category"]) => {
     setToDos((oldToDos) => {
       const targetIndex = oldToDos.findIndex((toDo) => toDo.id === id);
@@ -14,6 +15,10 @@ function ToDo({ text, category, id }: IToDo) {
         ...oldToDos.slice(targetIndex + 1),
       ];
     });
+  };
+
+  const onByeByeClick = () => {
+    setToDos((oldToDos) => oldToDos.filter((toDo) => toDo.id !== id));
   };
 
   return (
@@ -28,6 +33,13 @@ function ToDo({ text, category, id }: IToDo) {
       {category !== Categories.DONE && (
         <button onClick={() => onClick(Categories.DONE)}>Done</button>
       )}
+      <button
+        onClick={() => {
+          onByeByeClick();
+        }}
+      >
+        👋
+      </button>
     </li>
   );
 }

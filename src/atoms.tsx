@@ -1,4 +1,4 @@
-import { atom, selector } from "recoil";
+import { atom, AtomEffect, RecoilState, selector } from "recoil";
 
 //enum 은 계속해서 써야하는 값을 저장할 수 있는 도구.
 export enum Categories {
@@ -18,9 +18,27 @@ export const categoryState = atom<Categories>({
   default: Categories.TO_DO,
 });
 
+//type 이 나왓으면..
+const localStorageEffect: <T>(key: string) => AtomEffect<T> =
+  (key) =>
+  ({ setSelf, onSet }) => {
+    const items = localStorage.getItem(key);
+    if (items != null) {
+      setSelf(JSON.parse(items));
+    }
+    // reset.. 할껀지.. 안할껀지..
+    onSet((newItem, _, isReset) => {
+      isReset
+        ? localStorage.removeItem(key)
+        : localStorage.setItem(key, JSON.stringify(newItem));
+    });
+  };
+
+//effects 에서 localstrage 를 사용할때 State 의 key 와 동일한 key 값을 줘야함.
 export const toDoSate = atom<IToDo[]>({
   key: "toDo",
   default: [],
+  effects: [localStorageEffect<IToDo[]>("toDo")],
 });
 
 export const toDoSelector = selector({
